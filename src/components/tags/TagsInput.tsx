@@ -65,7 +65,7 @@ function TagsInput(props) {
 	};
 
 	const canAdd = (chip: string) => {
-		return canAddTag && tags.findIndex(tag => tag.label === chip.trim()) === -1;
+		return canAddTag && !chip.includes(" ") && tags.findIndex(tag => tag.label === chip.trim()) === -1;
 	};
 
 	const handleUpdateInput = e => {
