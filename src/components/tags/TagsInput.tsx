@@ -84,6 +84,7 @@ function TagsInput(props) {
 		<ChipInput
 			classes={{root, inputRoot, input, chipContainer: container}}
 			fullWidthInput
+			blurBehavior='add'
 			newChipKeyCodes={[13, 32]}
 			placeholder={placeholder || "Добавьте тэг..."}
 			alwaysShowPlaceholder
