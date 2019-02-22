@@ -13,11 +13,12 @@ function renderInput(inputProps) {
 		autoFocus,
 		value,
 		onChange,
+		onFocus,
 		addTag,
 		deleteTag,
 		updateTag,
 		tags,
-		ref,
+		refInput,
 		...other
 	} = inputProps;
 
@@ -29,11 +30,12 @@ function renderInput(inputProps) {
 			clearInputValueOnChange
 			inputValue={value}
 			onChange={onChange}
+			onFocus={onFocus}
 			onAdd={addTag}
 			onDeleteTag={deleteTag}
 			updateTag={updateTag}
 			tags={tags}
-			inputRef={ref}
+			refInput={refInput}
 			{...other}
 		/>
 	);
@@ -84,6 +86,9 @@ function getSuggestions(value: string, suggestions: string[]) {
 	const inputValue = value.trim().toLowerCase();
 	const inputLength = inputValue.length;
 	let count = 0;
+	if (!inputValue) {
+		return suggestions;
+	}
 
 	return inputLength === 0
 		? []
@@ -111,7 +116,8 @@ export default class TagsSuggest extends React.Component<any, any> {
 			textFieldInput: "",
 		};
 	}
-
+	inputRef: null | HTMLElement = null;
+	
 	handleSuggestionsFetchRequested = ({ value }) => {
 		this.setState({
 			suggestions: getSuggestions(value, this.props.suggestions)
@@ -129,6 +135,20 @@ export default class TagsSuggest extends React.Component<any, any> {
 			textFieldInput: newValue
 		});
 	};
+
+	componentWillUnmount() {
+		if (this.inputRef != null) {
+			this.inputRef.removeEventListener('focus', this.onFocus);
+		}
+	}
+
+	onFocus = (event) => {
+		this.setState({
+			suggestions: this.props.suggestions
+		});
+	};
+
+	ref = (e) => {this.inputRef = e;}
 
 	handleAddChip = (label) => {
 		this.setState({
@@ -151,6 +171,8 @@ export default class TagsSuggest extends React.Component<any, any> {
 					suggestionsList: classes.suggestionsList,
 					suggestion: classes.suggestion
 				}}
+				highlightFirstSuggestion={true}
+				shouldRenderSuggestions = {() => true}
 				renderInputComponent={renderInput}
 				suggestions={this.state.suggestions}
 				onSuggestionsFetchRequested={this.handleSuggestionsFetchRequested}
@@ -164,9 +186,11 @@ export default class TagsSuggest extends React.Component<any, any> {
 				}}
 				focusInputOnSuggestionClick={false}
 				inputProps={{
+					refInput: this.ref,
 					classes,
 					tags: this.props.tags,
 					onChange: this.handletextFieldInputChange,
+					onFocus: this.onFocus,
 					value: this.state.textFieldInput,
 					onAdd: this.handleAddChip,
 					onDelete: this.handleDeleteChip,

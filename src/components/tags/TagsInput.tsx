@@ -46,6 +46,7 @@ function TagsInput(props) {
 		autoFocus,
 		value,
 		onChange,
+		onFocus,
 		onAdd,
 		onDeleteTag,
 		deleteTag,
@@ -54,7 +55,7 @@ function TagsInput(props) {
 		placeholder,
 		canAddTag,
 		canClickTag,
-		ref,
+		refInput,
 		...other
 	} = props;
 	const [inputValue, setInputValue] = useState(value);
@@ -78,6 +79,11 @@ function TagsInput(props) {
 		onAdd(label);
 	};
 
+	const handleClickTag = (e, chip) => {
+		canClickTag && toggleFilter(chip);
+		e.stopPropagation();
+	};
+
 	const {root, inputRoot, container, input} = classes;
 
 	return (
@@ -91,17 +97,18 @@ function TagsInput(props) {
 			clearInputValueOnChange
 			onUpdateInput={handleUpdateInput}
 			onChange={onChange}
+			InputProps={{onFocus: onFocus}}
 			onAdd={label => handleAdd(label)}
 			onBeforeAdd={tag => canAdd(tag)}
 			value={tags}
 			inputValue={inputValue}
-			inputRef={ref}
+			inputRef={refInput}
 			chipRenderer={({ chip }) => (
 				<Chip
 					key={chip.label}
 					label={`#${chip.label}`+ (withCount ? ` (${chip.count})` : ``)}
 					className={!chip.filter ? classes.chip : classes.filter}
-					onClick={() => canClickTag && toggleFilter(chip)}
+					onClick={e => handleClickTag(e, chip)}
 					clickable={!!canClickTag}
 					onDelete={() => onDeleteTag(chip.label)}
 					deleteIcon={<span>x</span>}
