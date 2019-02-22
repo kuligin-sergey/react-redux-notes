@@ -98,7 +98,7 @@ function getTagLabelsFromText(text: string): string[] {
 		match = regexp.exec(text);
 	}
 
-	return labels;
+	return Array.from(new Set(labels));
 }
 
 function NoteCard(props: {note: Note, [key:string]: any}) {
